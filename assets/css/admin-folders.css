@@ -1,0 +1,52 @@
+/* Bazantik Photo Gallery – administrace složek a Quick Edit alb: oznámení o odkazu. */
+.bazantik-link-notice input {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 4px;
+}
+.inline-edit-row .bazantik-qe-link,
+.inline-edit-row .bazantik-qe-pw {
+    width: 100%;
+}
+
+/* Tlačítka úpravy složky jsou od začátku v řadě (Update, Zrušit, Delete); místo pro Zrušit je rezervované, dokud ho skript nepřesune */
+.edit-tag-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.edit-tag-actions #delete-link {
+    order: 3;
+}
+.edit-tag-actions #bazantik-folder-cancel {
+    order: 2;
+}
+.edit-tag-actions:not(.bazantik-ready)::after {
+    content: "";
+    order: 2;
+    width: 68px;
+    height: 1px;
+}
+#bazantik-folder-cancel-wrap {
+    display: none;
+}
+
+/* Tlačítko Update vypadá od načtení jako neaktivní; skript ho aktivuje jen při změně formuláře */
+.edit-tag-actions:not(.bazantik-ready) input.button-primary {
+    color: #8a8a8a !important;
+    background: #e2e2e2 !important;
+    border-color: #e2e2e2 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+}
+
+/* Popisky v Quick Editu složek (Parent folder, Folder privacy) se nesmí zalamovat, jinak se pole pod nimi posunou */
+#the-list .inline-edit-row fieldset label span.title {
+    width: 9em;
+    white-space: nowrap;
+}
+#the-list .inline-edit-row fieldset label span.input-text-wrap {
+    margin-left: 9em;
+}
+
+.bazantik-newkey .bazantik-newkey-note{display:block;margin-top:6px}

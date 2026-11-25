@@ -1,0 +1,15 @@
+.bazantik-order-level { margin: 12px 0 18px; }
+.bazantik-order-list { max-width: 640px; margin: 8px 0 0; padding: 0; }
+.bazantik-order-list li { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; padding: 8px 10px; background: #fff; border: 1px solid #c3c4c7; border-radius: 3px; }
+.bazantik-order-list li.ui-sortable-helper { box-shadow: 0 4px 12px rgba(0, 0, 0, .18); }
+.bazantik-order-list li.bazantik-order-placeholder { height: 38px; background: #f0f6fc; border: 1px dashed #2271b1; visibility: visible !important; }
+.bazantik-order-handle { cursor: grab; touch-action: none; padding: 4px; color: #50575e; }
+.bazantik-order-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bazantik-order-kind { color: #646970; font-size: 12px; }
+.bazantik-order-move { min-height: 30px; padding: 0 6px; line-height: 1; }
+.bazantik-order-move .dashicons { width: 18px; height: 18px; font-size: 18px; vertical-align: middle; }
+#bazantik-order-manual .bazantik-order-hint-auto { display: none; }
+#bazantik-order-manual.is-auto .bazantik-order-hint-auto { display: block; }
+#bazantik-order-manual.is-auto .bazantik-order-hint-manual { display: none; }
+.bazantik-order-list.is-readonly .bazantik-order-handle { cursor: default; opacity: .35; }
+.bazantik-order-list.is-readonly .bazantik-order-move { display: none; }

@@ -1,0 +1,1265 @@
+/* Layout alba a Justified mřížka */
+.bazantik-album-container {
+    max-width: 1650px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.bazantik-album-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+/* Výchozí velikosti s nulovou specificitou: pravidla tématu nebo uživatele je vždy přebijí */
+:where(.bazantik-album-title) {
+    font-size: 2.2rem;
+}
+.bazantik-album-title {
+    margin-bottom: 10px;
+}
+:where(.bazantik-album-breadcrumbs) {
+    font-size: 0.95rem;
+}
+.bazantik-album-breadcrumbs {
+    color: #767676;
+    margin-bottom: 15px;
+}
+.bazantik-crumb-path {
+    display: block;
+}
+.bazantik-crumb-path + .bazantik-crumb-path::before {
+    content: '';
+    display: block;
+    width: 5em;
+    height: 1px;
+    margin: 6px auto;
+    background: currentColor;
+    opacity: 0.4;
+}
+
+/* Kontejner Justified mřížky */
+.bazantik-justified-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+
+.bazantik-justified-grid .bazantik-grid-item {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background: #181818;
+    border-radius: 3px;
+    flex: none;
+    box-sizing: border-box;
+}
+.bazantik-justified-grid .bazantik-grid-item:hover img {
+    transform: scale(1.025);
+}
+
+/* Záložní rozložení bez JavaScriptu (třídu odebere gallery-lightbox.js): dlaždice s poměrem stran a odkazem na soubor */
+.bazantik-justified-grid.bazantik-nojs .bazantik-grid-item {
+    flex: 1 1 220px;
+    max-width: 100%;
+    height: 180px;
+}
+@supports (aspect-ratio: 1 / 1) {
+    .bazantik-justified-grid.bazantik-nojs .bazantik-grid-item {
+        height: auto;
+        aspect-ratio: var(--bazantik-ar, 3 / 2);
+    }
+}
+.bazantik-justified-grid.bazantik-nojs .bazantik-item-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.bazantik-nojs-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+}
+
+/* Ochrana před kolizí s Avada CSS: garantuje vyplnění celé buňky bez bílých pruhů */
+.bazantik-justified-grid .bazantik-item-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative;
+    overflow: hidden;
+    display: block;
+}
+.bazantik-justified-grid .bazantik-grid-item img,
+.bazantik-justified-grid .bazantik-grid-item video {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    max-width: none !important;
+    object-fit: cover !important;
+    display: block !important;
+    transition: transform 0.25s ease-out;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.bazantik-play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* Lightbox Modal */
+.bazantik-lightbox-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    z-index: 999999;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
+}
+.bazantik-lightbox-modal.is-active {
+    display: flex;
+}
+.bazantik-lightbox-backdrop {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.96);
+    background: rgba(0, 0, 0, var(--bazantik-backdrop-alpha, 0.96));
+    transition: opacity 0.2s ease;
+}
+.bazantik-lightbox-modal.bazantik-blur-on .bazantik-lightbox-backdrop {
+    -webkit-backdrop-filter: blur(var(--bazantik-backdrop-blur, 5px));
+    backdrop-filter: blur(var(--bazantik-backdrop-blur, 5px));
+}
+.bazantik-lightbox-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    overflow: hidden;
+}
+.bazantik-media-viewport {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Pulzující kolečko z kuliček */
+.bazantik-lightbox-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+.bazantik-lightbox-spinner.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+.bazantik-spinner-svg {
+    fill: #ffffff;
+    animation: bazantik-spinner-step 0.8s steps(8) infinite;
+}
+@keyframes bazantik-spinner-step {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Media Holder: Přirozeně centrovaný Flexbox - stabilní střed pro všechny transformace */
+#bazantik-media-holder {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+#bazantik-media-holder img,
+#bazantik-media-holder video {
+    object-fit: contain;
+    transform-origin: center center;
+    transition: width 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+    height 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: auto;
+}
+#bazantik-media-holder img {
+    cursor: zoom-in;
+    -webkit-user-drag: none;
+}
+#bazantik-media-holder video {
+    outline: none;
+}
+#bazantik-media-holder.is-zoomed img {
+    cursor: grab;
+}
+#bazantik-media-holder.is-zoomed.is-dragging img {
+    cursor: grabbing;
+    transition: none !important;
+}
+
+/* Postranní panel (EXIF & Nastavení) - přesně 364 px pro symetrické obepnutí lišty (20px po obou stranách) */
+.bazantik-lightbox-sidebar {
+    width: 364px;
+    min-width: 364px;
+    background: #161616;
+    color: #e0e0e0;
+    height: 100%;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #262626;
+    z-index: 15;
+    padding-top: 78px;
+    box-sizing: border-box;
+    overscroll-behavior: contain;
+    margin-right: -364px;
+    transition: margin-right 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.bazantik-lightbox-sidebar.is-open {
+    margin-right: 0;
+}
+.bazantik-sidebar-header {
+    padding: 0 20px 0 20px;
+    border-bottom: 1px solid #262626;
+}
+.bazantik-sidebar-tabs {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+.bazantik-tab-btn {
+    background: none !important;
+    border: none !important;
+    color: #888 !important;
+    font-size: 0.94rem;
+    font-weight: 600;
+    padding: 0 0 14px 0;
+    margin: 0;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.18s ease;
+    text-decoration: none;
+    outline: none;
+    box-shadow: none !important;
+}
+.bazantik-tab-btn:hover {
+    color: #ddd !important;
+}
+.bazantik-tab-btn.is-active {
+    color: #fff !important;
+}
+.bazantik-tab-btn.is-active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 2px 2px 0 0;
+}
+.bazantik-photo-title {
+    margin: 0 0 18px 0;
+    font-size: 1.15rem;
+    color: #fff;
+    font-weight: 600;
+    word-break: break-word;
+    line-height: 1.35;
+}
+.bazantik-sidebar-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    touch-action: pan-y;
+}
+
+/* Přepínání sekcí v panelu */
+.bazantik-panel-view {
+    display: none;
+}
+.bazantik-panel-view.is-active {
+    display: block;
+    animation: bazantik-fade-in 0.2s ease-out;
+}
+@keyframes bazantik-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Skupiny a prvky v nastavení */
+.bazantik-settings-group {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #262626;
+}
+.bazantik-settings-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.bazantik-settings-group-title {
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+    margin-bottom: 14px;
+    font-weight: 700;
+}
+
+.bazantik-settings-row {
+    margin-bottom: 18px;
+}
+.bazantik-settings-row-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0;
+}
+.bazantik-setting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.bazantik-setting-label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: default;
+    user-select: none;
+}
+.bazantik-setting-desc {
+    display: block;
+    font-size: 0.78rem;
+    color: #888;
+    margin-top: 2px;
+    line-height: 1.3;
+    user-select: none;
+}
+
+/* Odznak rychlosti: Čistě bílý a tučný */
+.bazantik-setting-badge {
+    background: #242424;
+    border: 1px solid #383838;
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+}
+
+/* Posuvník (Range Slider) */
+.bazantik-slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.bazantik-slider-bound {
+    font-size: 0.75rem;
+    color: #8a8a8a;
+    min-width: 24px;
+    user-select: none;
+}
+.bazantik-slider-wrap input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: #2d2d2d;
+    border-radius: 3px;
+    outline: none;
+    margin: 0;
+}
+.bazantik-slider-wrap input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    transition: transform 0.1s ease;
+}
+.bazantik-slider-wrap input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+/* Invertovaný bílý podklad, tmavý jezdec */
+.bazantik-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.bazantik-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+.bazantik-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #2c2c2c;
+    transition: background-color 0.22s ease, border-color 0.22s ease;
+    border-radius: 24px;
+    border: 1px solid #3d3d3d;
+}
+.bazantik-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #888888;
+    transition: transform 0.22s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.22s ease;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.bazantik-switch input:focus-visible + .bazantik-switch-slider {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.6);
+}
+.bazantik-switch input:checked + .bazantik-switch-slider {
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+.bazantik-switch input:checked + .bazantik-switch-slider:before {
+    transform: translateX(20px);
+    background-color: #141414;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* Rychlý přehled EXIF odznaků */
+.bazantik-exif-badges {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #262626;
+    text-align: center;
+}
+.bazantik-exif-badge {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 12px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+}
+.bazantik-exif-badge-icon {
+    color: #d0d0d0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+}
+.bazantik-exif-badge-val {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.15;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+}
+
+.bazantik-exif-group-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #8a8a8a;
+    margin: 18px 0 6px 0;
+    font-weight: 600;
+}
+.bazantik-exif-group-title:first-child {
+    margin-top: 0;
+}
+.bazantik-exif-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #202020;
+    font-size: 0.88rem;
+}
+.bazantik-exif-label {
+    color: #888;
+}
+.bazantik-exif-val {
+    color: #e0e0e0;
+    font-weight: 500;
+    text-align: right;
+    word-break: break-word;
+    max-width: 60%;
+}
+.bazantik-map-consent {
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    text-align: center;
+}
+.bazantik-map-consent p {
+    margin: 10px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #999;
+}
+.bazantik-map-load {
+    padding: 8px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+.bazantik-map-load:hover,
+.bazantik-map-load:focus-visible {
+    background: rgba(255, 255, 255, 0.2);
+}
+.bazantik-map-revoke {
+    display: none;
+    margin: 8px 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #999;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.bazantik-map-revoke:hover,
+.bazantik-map-revoke:focus-visible {
+    color: #ddd;
+}
+#bazantik-leaflet-map {
+    height: 220px;
+    border-radius: 6px;
+    margin-top: 12px;
+    border: 1px solid #333;
+}
+#bazantik-leaflet-map .bazantik-map-notice {
+    position: absolute;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    text-align: center;
+    background: rgba(20, 20, 20, 0.88);
+    color: #ddd;
+    font-size: 13px;
+    border-radius: 6px;
+}
+#bazantik-leaflet-map .bazantik-map-notice p {
+    margin: 0;
+}
+#bazantik-leaflet-map .bazantik-map-notice button {
+    background: #fff;
+    color: #111;
+    border: 0;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+}
+/* Přepínač vrstev: ikona jako SVG (složka images Leafletu se nepřibaluje) */
+#bazantik-leaflet-map .leaflet-control-layers-toggle {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='1.8' stroke-linejoin='round'><path d='M12 3 2 8l10 5 10-5z'/><path d='m2 12 10 5 10-5'/><path d='m2 16 10 5 10-5'/></svg>");
+    background-size: 22px 22px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+#bazantik-leaflet-map .leaflet-control-layers-expanded {
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #222;
+}
+#bazantik-leaflet-map .leaflet-bottom.leaflet-left .bazantik-map-logo {
+    margin-bottom: 20px;
+}
+#bazantik-leaflet-map .leaflet-bottom.leaflet-left .bazantik-map-logo--mapycz {
+    margin-bottom: 34px;
+}
+#bazantik-leaflet-map .bazantik-map-logo img {
+    display: block;
+    height: 24px;
+    width: auto;
+}
+
+/* Ovládací tlačítka */
+.bazantik-lb-btn, .bazantik-tool-btn {
+    background: rgba(35, 35, 35, 0.75);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0;
+    transition: opacity 0.3s ease, background 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 25;
+    outline: none;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transform-origin: center center;
+    box-sizing: border-box;
+}
+
+@media (hover: hover) {
+    .bazantik-tool-btn:hover, .bazantik-btn-close:hover {
+        background: rgba(70, 70, 70, 0.95);
+        border-color: rgba(255, 255, 255, 0.35);
+        transform: scale(1.06);
+    }
+    .bazantik-btn-prev:hover, .bazantik-btn-next:hover {
+        background: rgba(70, 70, 70, 0.95);
+        border-color: rgba(255, 255, 255, 0.35);
+        transform: translateY(-50%) scale(1.06);
+    }
+}
+
+.bazantik-tool-btn.is-active {
+    background: rgba(95, 95, 95, 0.95);
+    border-color: rgba(255, 255, 255, 0.45);
+    color: #fff;
+}
+@media (hover: hover) {
+    .bazantik-tool-btn.is-active:hover {
+        background: rgba(125, 125, 125, 1);
+        border-color: #fff;
+        transform: scale(1.08);
+    }
+}
+
+/* Křížek je řadovým tlačítkem uvnitř sbalitelné skupiny */
+.bazantik-btn-close {
+    width: 44px;
+    height: 44px;
+}
+.bazantik-btn-prev {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+}
+.bazantik-btn-next {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    transition: right 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease, background 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Šipka ustupuje před 364px panelem se symetrickou 20px rezervou (364 + 20) */
+@media (min-width: 769px) {
+    #bazantik-lightbox.has-sidebar .bazantik-btn-next,
+    #bazantik-lightbox:has(#bazantik-sidebar.is-open) .bazantik-btn-next {
+        right: 384px;
+    }
+}
+
+#bazantik-lightbox.bazantik-hide-arrows .bazantik-btn-prev,
+#bazantik-lightbox.bazantik-hide-arrows .bazantik-btn-next {
+    display: none !important;
+}
+
+/* Horní lišta je nyní ukotvena úplně vpravo u okraje (right: 20px) */
+.bazantik-top-toolbar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 25;
+    transition: opacity 0.3s ease;
+    overflow: visible;
+    touch-action: none;
+}
+
+/* Decentní indikátor načítání plné kvality (HQ) při zoomu - bez rámečku, plovoucí HUD styl */
+.bazantik-hq-spinner {
+    position: absolute;
+    top: 20px;
+    right: 360px; /* Výchozí pozice: vlevo před tlačítkem fullscreenu */
+    width: 44px;
+    height: 44px;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(70, 70, 70, 0.65);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    transform: scale(0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    transition: right 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.2s ease,
+    transform 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+    visibility 0.2s ease;
+    z-index: 26;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.bazantik-hq-spinner.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+/* 1. Při zavřeném infopanelu a sbalené liště: posun hned vedle sbaleného chevronu */
+#bazantik-lightbox:not(.has-sidebar) .bazantik-top-toolbar.is-collapsed ~ .bazantik-hq-spinner {
+    right: 76px;
+}
+
+/* 2. Při otevřeném infopanelu: VŽDY vlevo mimo infopanel v rohu fotky (ať je lišta sbalená či rozbalená) */
+#bazantik-lightbox.has-sidebar .bazantik-hq-spinner {
+    right: 384px;
+}
+
+/* Sbalitelná skupina (informace, celá obrazovka, prezentace, stažení, křížek) - vyjíždění přímo z chevronu */
+.bazantik-toolbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    max-width: 380px;
+    opacity: 1;
+    overflow: hidden;
+    padding: 8px;
+    margin: -8px;
+    transform: translateX(0);
+    transition: max-width 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.22s ease, transform 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.bazantik-toolbar-actions .bazantik-tool-btn {
+    flex-shrink: 0;
+}
+
+.bazantik-top-toolbar.is-collapsed .bazantik-toolbar-actions {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: -4px;
+    margin-right: -4px;
+    pointer-events: none;
+    transform: translateX(20px);
+    /* Sbalená tlačítka nesmí být dostupná klávesnicí (Tab, mezerník) ani čtečkou */
+    visibility: hidden;
+    transition: max-width 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.22s ease, transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s linear 0.28s;
+}
+
+/* Chevron zůstává v decentním nepodsvíceném stavu */
+.bazantik-btn-collapse,
+.bazantik-btn-collapse.is-active {
+    width: 44px;
+    height: 44px;
+    background: rgba(35, 35, 35, 0.75) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+}
+.bazantik-btn-collapse svg {
+    transition: transform 0.25s ease;
+}
+
+@media (hover: hover) {
+    .bazantik-btn-collapse:hover,
+    .bazantik-btn-collapse.is-active:hover {
+        background: rgba(70, 70, 70, 0.95) !important;
+        border-color: rgba(255, 255, 255, 0.35) !important;
+        transform: scale(1.06) !important;
+    }
+}
+
+.bazantik-tool-btn {
+    width: 44px;
+    height: 44px;
+}
+.bazantik-tool-btn svg, .bazantik-lb-btn svg {
+    display: block;
+    pointer-events: none;
+}
+
+/* Automatické skrývání při nečinnosti (Auto-Hide Idle) */
+#bazantik-lightbox.bazantik-ui-idle {
+    cursor: none;
+}
+#bazantik-lightbox.bazantik-ui-idle .bazantik-top-toolbar,
+#bazantik-lightbox.bazantik-ui-idle .bazantik-btn-close,
+#bazantik-lightbox.bazantik-ui-idle .bazantik-btn-prev,
+#bazantik-lightbox.bazantik-ui-idle .bazantik-btn-next {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Mřížka archivu alb */
+.bazantik-albums-archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+.bazantik-album-card {
+    background: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.bazantik-album-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.bazantik-album-card-cover {
+    width: 100%;
+    height: 200px;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.bazantik-album-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.bazantik-album-card-meta {
+    padding: 16px;
+}
+.bazantik-album-card-title {
+    font-size: 1.15rem;
+    color: #fff;
+    margin: 0;
+    font-weight: 600;
+}
+.bazantik-album-card-stats {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    color: #b5b5b5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+.bazantik-album-card-stats .bazantik-stats-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.bazantik-album-card-stats .bazantik-stats-icon {
+    flex: none;
+}
+.bazantik-no-cover {
+    color: #555;
+    font-size: 40px;
+}
+.bazantik-folder-card .bazantik-album-card-cover {
+    position: relative;
+}
+.bazantik-collage {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    gap: 2px;
+}
+.bazantik-collage-2,
+.bazantik-collage-3,
+.bazantik-collage-4 {
+    grid-template-columns: 1fr 1fr;
+}
+.bazantik-collage-3,
+.bazantik-collage-4 {
+    grid-template-rows: 1fr 1fr;
+}
+.bazantik-collage-3 .bazantik-collage-cell:first-child {
+    grid-row: 1 / span 2;
+}
+.bazantik-collage-cell {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+.bazantik-collage-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.bazantik-vis-icon {
+    display: inline-block;
+    vertical-align: -0.12em;
+    margin-right: 0.4em;
+    width: 0.95em;
+    height: 0.95em;
+    color: #b5b5b5;
+}
+.bazantik-folder-badge {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    display: flex;
+    padding: 5px;
+    border-radius: 6px;
+    color: #fff;
+    background: rgba(0,0,0,0.55);
+    line-height: 0;
+}
+.bazantik-empty-notice,
+.bazantik-password-form-wrapper {
+    text-align: center;
+    padding: 60px 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .bazantik-desktop-only {
+        display: none !important;
+    }
+    
+    .bazantik-lightbox-sidebar {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        min-width: 100%;
+        padding-top: 92px;
+        margin-right: 0;
+        transform: translateX(100%);
+        transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .bazantik-lightbox-sidebar.is-open {
+        transform: translateX(0);
+        margin-right: 0;
+    }
+    .bazantik-btn-prev, .bazantik-btn-next {
+        display: none !important;
+    }
+    .bazantik-top-toolbar {
+        right: 16px;
+        gap: 8px;
+    }
+    .bazantik-toolbar-actions {
+        gap: 6px;
+        padding: 8px;
+        margin: -8px;
+    }
+    .bazantik-top-toolbar.is-collapsed .bazantik-toolbar-actions {
+        margin-left: -2px;
+        margin-right: -2px;
+    }
+    .bazantik-btn-close, .bazantik-tool-btn {
+        width: 40px;
+        height: 40px;
+    }
+    .bazantik-btn-collapse,
+    .bazantik-btn-collapse.is-active {
+        width: 40px;
+        height: 40px;
+    }
+    .bazantik-hq-spinner {
+        width: 40px;
+        height: 40px;
+        right: 294px;
+    }
+    /* Bez tlačítka celé obrazovky (iPhone) je lišta užší o jedno tlačítko a mezeru */
+    #bazantik-lightbox.bazantik-no-fullscreen .bazantik-hq-spinner {
+        right: 248px;
+    }
+    #bazantik-lightbox:not(.has-sidebar) .bazantik-top-toolbar.is-collapsed ~ .bazantik-hq-spinner {
+        right: 66px;
+    }
+    #bazantik-lightbox.has-sidebar .bazantik-hq-spinner {
+        display: none;
+    }
+}
+/* Nehotové fotky: rozostřená dlaždice se spinnerem (jen v mřížce, v lightboxu se přeskakují) */
+.bazantik-justified-grid .bazantik-grid-item--pending {
+    cursor: default;
+}
+.bazantik-justified-grid .bazantik-grid-item--pending img {
+    filter: blur(14px) brightness(0.7);
+    transform: scale(1.15);
+}
+.bazantik-justified-grid .bazantik-grid-item--pending:hover img {
+    transform: scale(1.15);
+}
+.bazantik-pending-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+/* Plynulé zjasnění dlaždice, která se právě dokončila */
+.bazantik-grid-item--just-ready {
+    animation: bazantik-tile-reveal 0.6s ease-out;
+}
+@keyframes bazantik-tile-reveal {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+/* Karty alb v šabloně přehledu: přebití velkých stylů nadpisů z Avady */
+.bazantik-album-card .bazantik-album-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+.bazantik-album-card .bazantik-album-card-title {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 1.15rem !important;
+    line-height: 1.3 !important;
+    color: #fff !important;
+}
+/* Přehled alb vložený shortcodem na stránku: malý okraj po stranách (téma ho často neposkytuje) */
+.bazantik-albums-archive-grid--embedded {
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+/* Stránkování přehledu alb vloženého shortcodem */
+.bazantik-archive-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin: 20px 0;
+}
+.bazantik-archive-pagination .page-numbers {
+    padding: 6px 12px;
+    border: 1px solid rgba(128, 128, 128, .4);
+    border-radius: 6px;
+    text-decoration: none;
+}
+.bazantik-archive-pagination .page-numbers.current {
+    font-weight: 700;
+    border-color: currentColor;
+}
+/* Album vložené shortcodem [bazantik_album]: malý okraj po stranách */
+.bazantik-album-embed {
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+/* Značka na mapě (vlastní SVG, žádné externí obrázky) */
+.bazantik-map-pin {
+    background: none;
+    border: none;
+}
+.bazantik-map-pin svg {
+    display: block;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+}
+
+/* Dlaždice videa v mřížce: video se v mřížce nenačítá (stahovalo se celé), načte se až v lightboxu */
+.bazantik-justified-grid .bazantik-video-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #2c2c2c, #0f0f0f);
+}
+
+/* Mobil: u videa se v lightboxu zobrazí šipky (swipování přes video nefunguje) */
+@media (max-width: 768px) {
+    #bazantik-lightbox.bazantik-is-video .bazantik-btn-prev,
+    #bazantik-lightbox.bazantik-is-video .bazantik-btn-next {
+        display: flex !important;
+    }
+}
+
+/* Swipe přes video nefunguje, proto má video na dotykových zařízeních šipky vždy (i mimo úzké okno) */
+#bazantik-lightbox.bazantik-touch-only.bazantik-is-video .bazantik-btn-prev,
+#bazantik-lightbox.bazantik-touch-only.bazantik-is-video .bazantik-btn-next {
+    display: flex !important;
+}
+
+#bazantik-lightbox:focus {
+    outline: none;
+}
+
+/* Viditelný fokus při ovládání klávesnicí (ostatní pravidla výše ruší outline jen pro myš a dotyk) */
+#bazantik-lightbox button:focus-visible,
+#bazantik-lightbox a:focus-visible,
+#bazantik-lightbox input:focus-visible,
+#bazantik-lightbox [role="tab"]:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* Bez Tabu (po kliknutí myší nebo dotyku) se obrys nekreslí; Chrome a Edge ho jinak ukážou po stisku šipky */
+#bazantik-lightbox:not(.bazantik-kbd-nav) button:focus-visible,
+#bazantik-lightbox:not(.bazantik-kbd-nav) a:focus-visible,
+#bazantik-lightbox:not(.bazantik-kbd-nav) input:focus-visible,
+#bazantik-lightbox:not(.bazantik-kbd-nav) [role="tab"]:focus-visible,
+#bazantik-lightbox:not(.bazantik-kbd-nav) .bazantik-switch input:focus-visible + .bazantik-switch-slider {
+    outline: none;
+}
+
+/* Fokus videa při ovládání klávesnicí: obrys uvnitř videa (venku by ho oříznul kontejner); funguje před spuštěním v Safari */
+#bazantik-lightbox #bazantik-media-holder video:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: -3px;
+    box-shadow: inset 0 0 0 6px rgba(0, 0, 0, 0.45);
+}
+
+/* Respektuje systémové nastavení omezení pohybu */
+@media (prefers-reduced-motion: reduce) {
+    #bazantik-lightbox *,
+    .bazantik-justified-grid * {
+        transition-duration: 0.01ms !important; /* indikátory načítání (animace) zůstávají */
+    }
+}
+
+.bazantik-video-error {
+    position: absolute;
+    left: 50%;
+    bottom: 12%;
+    transform: translateX(-50%);
+    max-width: 80%;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+    z-index: 5;
+}
+
+/* Viditelný fokus dlaždice při ovládání klávesnicí */
+.bazantik-justified-grid .bazantik-grid-item:focus {
+    outline: none;
+}
+.bazantik-justified-grid .bazantik-grid-item:focus-visible::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    border: 4px solid #2271b1;
+    box-shadow: inset 0 0 0 2px #fff;
+    pointer-events: none;
+}
+
+/* Zamčená karta alba nebo složky: univerzální rozostřený zástupný obrázek se zámkem (skutečná obálka se neprozradí) */
+.bazantik-card-locked-cover {
+    position: relative;
+    background: linear-gradient(135deg, #3a3d44, #23252a 55%, #4a4e57);
+    color: #e2e2e2;
+}
+.bazantik-card-locked-cover::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    bottom: -20px;
+    left: -20px;
+    background:
+        radial-gradient(circle at 25% 30%, rgba(255, 255, 255, .2), transparent 45%),
+        radial-gradient(circle at 75% 70%, rgba(255, 255, 255, .14), transparent 50%);
+    filter: blur(14px);
+}
+.bazantik-card-locked-cover .bazantik-lock-icon {
+    position: relative;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .5));
+}
+/* Formulář hesla složky */
+.bazantik-folder-password form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+.bazantik-folder-error {
+    color: #d63638;
+    font-weight: 600;
+}

@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "bazantik-photo-gallery/album-embed",
+	"title": "Bazantik Photo Gallery album",
+	"category": "media",
+	"icon": "format-gallery",
+	"description": "Embeds an album from Bazantik Photo Gallery.",
+	"textdomain": "bazantik-photo-gallery",
+	"attributes": {
+		"albumId": {
+			"type": "integer",
+			"default": 0
+		}
+	}
+}
