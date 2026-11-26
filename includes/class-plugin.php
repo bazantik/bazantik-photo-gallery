@@ -22,6 +22,7 @@ final class Plugin {
 		add_action( 'init', [ Post_Types::class, 'register' ], 0 );
 		add_action( 'template_redirect', [ Post_Types::class, 'redirect_bare_bases' ], 0 );
 		add_filter( 'post_type_archive_title', [ Post_Types::class, 'archive_title' ], 10, 2 );
+		add_filter( 'wp_terms_checklist_args', [ Post_Types::class, 'keep_folder_tree' ] );
 		add_filter( 'plugin_row_meta', static function ( array $links, string $file ): array {
 			if ( plugin_basename( BAZANTIK_PLUGIN_DIR . 'bazantik-photo-gallery.php' ) === $file ) {
 				$links[] = '<a href="' . esc_url( Settings::URL_SUPPORT ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Support the author', 'bazantik-photo-gallery' ) . '</a>';

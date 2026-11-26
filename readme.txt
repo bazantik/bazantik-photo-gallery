@@ -5,7 +5,7 @@ Tags: gallery, photo gallery, photography, albums, exif
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -59,7 +59,7 @@ Upload photos with the uploader in the album editor: it creates the optimized si
 
 = Is OpenStreetMap a good choice for the map background on a busy site? =
 
-OpenStreetMap's public tile servers are free for light use but come without any guarantee and have a [usage policy](https://operations.osmfoundation.org/policies/tiles/). For a busy site choose a tile provider in Settings (presets for Mapy.com, Thunderforest, Stadia Maps, MapTiler and Mapbox, or your own tile URL) and enter your API key. The key is part of the tile URL and therefore visible in the page source, so use a key meant for public (browser) use and, where the provider allows it, restrict it to your domain in the provider's dashboard (not every provider offers this; with Mapbox use a public `pk.` token, never a secret one). Check the provider's usage limits and terms: free plans may be for non-commercial use only, may require a logo, and some layers (for example satellite) may need a paid plan. If the selected provider offers more than one layer, the visitor can switch layers on the map (this can be turned off in Settings). If the provider stops delivering tiles, the visitor sees a notice and can switch the map to OpenStreetMap.
+OpenStreetMap's public tile servers are free for light use but come without any guarantee and have a [usage policy](https://operations.osmfoundation.org/policies/tiles/). For a busy site choose a tile provider in Settings (presets for Mapy.com, Thunderforest, Stadia Maps, MapTiler and Mapbox, or your own tile URL) and enter your API key. The key is part of the tile URL and therefore visible in the page source, so use a key meant for public (browser) use and, where possible, restrict it to your domain in the provider's dashboard (not every provider offers this; with Mapbox use a public `pk.` token, never a secret one). Check the provider's terms: free plans may be non-commercial only, may require a logo, and some layers (e.g. satellite) may need a paid plan. If the provider offers several layers, the visitor can switch them on the map (can be turned off in Settings). If the provider stops delivering tiles, the visitor sees a notice and can switch the map to OpenStreetMap.
 
 = Does the plugin work without a map provider account? =
 
@@ -96,7 +96,7 @@ Only settings, scheduled tasks and stored folder passwords are removed. Albums, 
 == Screenshots ==
 
 1. Album page with a justified photo grid that keeps every photo's original proportions.
-2. Lightbox with a top toolbar (info, fullscreen, slideshow, download, close, collapse) and navigation arrows.
+2. Lightbox with a top toolbar (info, fullscreen, slideshow, download) and navigation arrows.
 3. Lightbox side panel with the photo's EXIF data (camera, lens, exposure settings, date).
 4. The same side panel with a map showing where the photo was taken.
 5. Lightbox settings (shown with the toolbar collapsed): slideshow speed and loop, navigation arrows, auto-hiding controls, and a translucent, optionally blurred background.
@@ -106,6 +106,9 @@ Only settings, scheduled tasks and stored folder passwords are removed. Albums, 
 9. Plugin settings page.
 
 == Changelog ==
+
+= 1.0.1 =
+* Fixed: a nested folder no longer jumps to the top of the folder list after saving an album.
 
 = 1.0.0 =
 * First public release.

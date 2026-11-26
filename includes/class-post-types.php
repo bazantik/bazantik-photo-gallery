@@ -35,6 +35,14 @@ class Post_Types {
 		return ( 'bazantik_album' === $post_type && ! is_admin() ) ? __( 'Gallery', 'bazantik-photo-gallery' ) : $title;
 	}
 
+	/** WordPress po uložení vytahuje zaškrtnuté složky na začátek seznamu, takže vnořená složka vypadá, že nemá rodiče. */
+	public static function keep_folder_tree( $args ) {
+		if ( is_array( $args ) && isset( $args['taxonomy'] ) && 'bazantik_folder' === $args['taxonomy'] ) {
+			$args['checked_ontop'] = false;
+		}
+		return $args;
+	}
+
 	public static function register(): void {
 		// Custom Post Type: bazantik_album
 		$album_labels = [

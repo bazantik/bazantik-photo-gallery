@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Bazantik Photo Gallery
  * Description: Self-hosted photo gallery with folders, albums and private albums, full-screen lightbox, EXIF, maps and background processing of large uploads.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      Martin Bazant
  * Author URI:  https://bazantik.eu
  * Requires at least: 6.3
@@ -25,7 +25,7 @@ namespace BazantikPhotoGallery;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BAZANTIK_VERSION', '1.0.0' );
+define( 'BAZANTIK_VERSION', '1.0.1' );
 define( 'BAZANTIK_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BAZANTIK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
